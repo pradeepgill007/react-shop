@@ -9,6 +9,8 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import useGetRepos from './service';
 import { InitialData } from './utils/interface/repoList';
@@ -26,9 +28,10 @@ function App() {
   const [dataTest, setTestData] = useState(initialData);
   const [value, setValue] = useState('allRepo');
   const [hasLoadMore, sethasLoadMore] = useState(false);
+  const [language, setLanguage] = useState('js');
 
   // custome hook to get data from server
-  const [data, isLoadMore, loading, error] = useGetRepos(dataTest, hasLoadMore);
+  const [data, isLoadMore, loading, error] = useGetRepos(dataTest, hasLoadMore, language);
 
   // update state when response from server
   useEffect(() => {
@@ -38,6 +41,18 @@ function App() {
   // update tab state
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
+  };
+
+   /**
+   * Function to change language
+   *
+   * @param event  select box event
+   */
+  const languageChange = (event: SelectChangeEvent) => {
+    const clone = { ...dataTest };
+    clone.repos = [];
+    setTestData(clone);
+    setLanguage(event.target.value as string);
   };
 
   /**
@@ -80,6 +95,15 @@ function App() {
         </TabList>
       </Box>
       <TabPanel value='allRepo'>
+      <Select
+          value={language}
+          label="Language"
+          onChange={languageChange}
+        >
+          <MenuItem value='js'>Javascript</MenuItem>
+          <MenuItem value='go'>GO</MenuItem>
+          <MenuItem value='php'>PHP</MenuItem>
+        </Select>
         <RepoList
           repos={dataTest.repos}
           isLoadMore={isLoadMore}

@@ -17,10 +17,10 @@ date.setDate(date.getDate() - 7);
 const queryDateTime = date.toISOString().substr(0, 10);
 
 // API service to get the result from server
-const getRepos = async (pageNumber: number) => {
+const getRepos = async (pageNumber: number, language: string) => {
   let response: any;
   let error: string = '';
-  let query = `q=created:>${queryDateTime}&sort=stars&order=desc&per_page=${LIMIT_PER_PAGE}&page=${pageNumber}`;
+  let query = `q=created:>${queryDateTime}+language:${language}&sort=stars&order=desc&per_page=${LIMIT_PER_PAGE}&page=${pageNumber}`;
 
   let requestUrl = BASE_URL_DEV;
   if (process.env.NODE_ENV === 'production') {
@@ -46,7 +46,7 @@ const getRepos = async (pageNumber: number) => {
  * @param initialData initial data for repo and count the number of pages
  * @param hasLoadMore loader for load more repos on load more button click
  */
-const useGetRepos = (initialData: InitialData, hasLoadMore: boolean) => {
+const useGetRepos = (initialData: InitialData, hasLoadMore: boolean, language: string) => {
 
   const [data, setData] = useState(initialData);
   const [error, setError] = useState('');
@@ -56,7 +56,7 @@ const useGetRepos = (initialData: InitialData, hasLoadMore: boolean) => {
   useEffect(() => {
     hasLoadMore ? setIsLoadMore(true) : setloading(true);
     const getData = async () => {
-      const { response, error } = await getRepos(initialData.currentPage);
+      const { response, error } = await getRepos(initialData.currentPage, language);
 
       const normalizedResponse = {
         ...initialData,
@@ -74,7 +74,7 @@ const useGetRepos = (initialData: InitialData, hasLoadMore: boolean) => {
     };
 
     getData();
-  }, [initialData.currentPage]);
+  }, [initialData.currentPage, language]);
 
   return [data, isLoadMore, loading, error] as const;
 };
